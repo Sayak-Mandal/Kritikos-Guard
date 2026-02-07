@@ -95,7 +95,8 @@ with tab_security:
         st.divider()
         
         # VISUAL HEALTH METER LOGIC
-        score_match = re.search(r"Score[:\s]*(\d+)", st.session_state['report_security'])
+        # This version looks for the number anywhere near the word 'Score'
+        score_match = re.search(r"Score.*?\b(\d{1,3})\b", st.session_state['report_security'], re.IGNORECASE)
         if score_match:
             score = int(score_match.group(1))
             st.write(f"### 🛡️ Security Health Score: {score}/100")
