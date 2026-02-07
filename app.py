@@ -79,7 +79,6 @@ with tab_security:
                   "2. A detailed breakdown of vulnerabilities. "
                   "3. The FULL corrected code block at the end. "
                   "CRITICAL: Be objective, transparent, and do not claim to be a human researcher."
-                  )
                 )
                 if upload_type == "Code/File":
                     content = u_text if u_text else "Audit this file."
