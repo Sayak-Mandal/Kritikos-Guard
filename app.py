@@ -208,33 +208,50 @@ with tab_audit:
 # --- TAB 2: GRAMMAR ---
 with tab_grammar:
     st.markdown("### ✍️ Executive Communication Refinement")
-    g_input = st.text_area("Paste Draft Communication:", height=200, key="g_input")
+    g_input = st.text_area("Paste Draft Communication:", height=200, key="g_input", placeholder="e.g., where is they now? when was they return?")
     
     col_t, col_a = st.columns(2)
-    with col_t: tone = st.selectbox("Persona:", ["Executive", "Direct", "Friendly"], key="g_tone")
-    with col_a: action = st.radio("Optimization:", ["Grammar Check", "Zen Mode (Clean/Minimalist)"], horizontal=True)
+    with col_t: 
+        tone = st.selectbox("Persona:", ["Executive", "Direct", "Colloquial"], key="g_tone")
+    with col_a: 
+        # Renamed to Architect Mode for a modern vibe
+        action = st.radio("Optimization:", ["Grammar Check", "Architect Mode"], horizontal=True)
 
     if st.button("✨ REFINE COMMUNICATION"):
-        if not g_input: st.warning("Please enter text.")
+        if not g_input: 
+            st.warning("Please enter some text to refine.")
         else:
-            with st.spinner("Processing..."):
+            with st.spinner("Refining..."):
                 try:
+                    # Initialize client
                     client = genai.Client(api_key=api_key)
-                    resp = client.models.generate_content(model=CURRENT_MODEL) # Create a strict constraint-based prompt
-                    prompt = ( f"Task: {action}\n"
-                              f"Tone: {style}\n"
-                              f"Input: '{g_input}'\n"
-                              "CRITICAL RULE: Output ONLY the corrected text. "
-                              "Do NOT include explanations, do NOT include quotes, and do NOT talk to the user. "
-                              "If the input is already correct, return it exactly as it is."
+                    
+                    # Modern Sentinel Prompt to prevent chatter
+                    prompt = (
+                        f"Task: {action}\n"
+                        f"Tone: {tone}\n"
+                        f"Input: '{g_input}'\n"
+                        "CRITICAL: Output ONLY the corrected text. Do NOT explain, "
+                        "do NOT use quotes, and do NOT add intro/outro text."
                     )
-                    st.session_state['report_grammar'] = resp.text
-                except Exception as e: st.error(f"Error: {e}")
 
+                    # KEYWORD FIX: Added model= and contents=
+                    resp = client.models.generate_content(
+                        model="gemini-2.0-flash", 
+                        contents=prompt
+                    )
+                    
+                    st.session_state['report_grammar'] = resp.text
+                except Exception as e: 
+                    st.error(f"Technical Error: {e}")
+
+    # Display Result
     if 'report_grammar' in st.session_state:
         st.divider()
         st.success("✅ Refined Version:")
-        st.write(st.session_state['report_grammar'])
+        # Displaying in a code block or text area makes it easy to copy
+        st.code(st.session_state['report_grammar'], language=None)
+        
         if st.button("🗑️ Clear Result"):
             del st.session_state['report_grammar']
             st.rerun()
