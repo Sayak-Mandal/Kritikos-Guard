@@ -237,7 +237,7 @@ with tab_grammar:
 
                     # KEYWORD FIX: Added model= and contents=
                     resp = client.models.generate_content(
-                        model="gemini-2.0-flash", 
+                        model="gemini-2.5-flash", 
                         contents=prompt
                     )
                     
