@@ -211,8 +211,8 @@ with tab_grammar:
     g_input = st.text_area("Paste Draft Communication:", height=200, key="g_input")
     
     col_t, col_a = st.columns(2)
-    with col_t: tone = st.selectbox("Persona:", ["Executive", "Direct", "Colloquial"], key="g_tone")
-    with col_a: action = st.radio("Optimization:", ["Grammar Check", "Full Strategic Rewrite"], horizontal=True)
+    with col_t: tone = st.selectbox("Persona:", ["Executive", "Direct", "Friendly"], key="g_tone")
+    with col_a: action = st.radio("Optimization:", ["Grammar Check", "Zen Mode (Clean/Minimalist)"], horizontal=True)
 
     if st.button("✨ REFINE COMMUNICATION"):
         if not g_input: st.warning("Please enter text.")
@@ -220,7 +220,14 @@ with tab_grammar:
             with st.spinner("Processing..."):
                 try:
                     client = genai.Client(api_key=api_key)
-                    resp = client.models.generate_content(model=CURRENT_MODEL, contents=[f"Professional {action} in {tone} tone for IT context: {g_input}"])
+                    resp = client.models.generate_content(model=CURRENT_MODEL, # Create a strict constraint-based prompt
+                    prompt = ( f"Task: {action}\n"
+                              f"Tone: {style}\n"
+                              f"Input: '{g_input}'\n"
+                              "CRITICAL RULE: Output ONLY the corrected text. "
+                              "Do NOT include explanations, do NOT include quotes, and do NOT talk to the user. "
+                              "If the input is already correct, return it exactly as it is."
+                    )
                     st.session_state['report_grammar'] = resp.text
                 except Exception as e: st.error(f"Error: {e}")
 
