@@ -9,15 +9,17 @@ st.set_page_config(page_title="Kritikos Guard | Pro Developer Hub", layout="wide
 
 # The function that clears EVERYTHING
 def global_reset():
-    for key in st.session_state.keys():
+    # Clear the session state
+    for key in list(st.session_state.keys()):
         del st.session_state[key]
-    st.rerun()
+    # REMOVED st.rerun() - Streamlit does this automatically on button click
 
 # Callback for just the Writing Ally
 def reset_writing_ally():
     st.session_state['writing_input'] = ""
     if 'report_grammar' in st.session_state:
         st.session_state['report_grammar'] = ""
+    # REMOVED st.rerun()
 
 # --- 2. SIDEBAR (Restored Status & Privacy) ---
 with st.sidebar:
