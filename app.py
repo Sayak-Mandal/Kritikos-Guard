@@ -102,6 +102,30 @@ with tab_security:
         pdf.multi_cell(0, 10, txt=st.session_state['report_security'].encode('latin-1', 'replace').decode('latin-1'))
         pdf_bytes = pdf.output(dest='S').encode('latin-1')
         st.download_button("📥 Download Audit (PDF)", data=pdf_bytes, file_name="Security_Audit.pdf")
+        if st.session_state.get('report_security'):
+        st.divider()
+        
+        # --- NEW VISUAL HEALTH METER START ---
+        # This regex looks for a number after the word 'Score' in the AI's response
+        import re
+        score_match = re.search(r"Score[:\s]*(\d+)", st.session_state['report_security'])
+        if score_match:
+            score = int(score_match.group(1))
+            st.write(f"### 🛡️ Security Health Score: {score}/100")
+            
+            # Change color based on score
+            if score >= 80:
+                st.progress(score / 100)
+                st.success("🟢 Your code follows strong security patterns.")
+            elif score >= 50:
+                st.progress(score / 100)
+                st.warning("🟡 Moderate risks identified. See breakdown below.")
+            else:
+                st.progress(score / 100)
+                st.error("🔴 Critical vulnerabilities detected. Immediate fix required.")
+        # --- NEW VISUAL HEALTH METER END ---
+
+        st.markdown(st.session_state['report_security'])
 
 # --- TAB 2: WRITING ALLY (Restored Preview & Clear) ---
 with tab_grammar:
