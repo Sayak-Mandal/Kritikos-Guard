@@ -196,7 +196,9 @@ with tab_audit:
             pdf = FPDF(); pdf.add_page(); pdf.set_font("Arial", size=11)
             clean_txt = report.encode('ascii', 'ignore').decode('ascii')
             pdf.multi_cell(0, 10, clean_txt)
-            st.download_button("📥 Export Audit Report", bytes(pdf.output()), "Kritikos_Report.pdf", use_container_width=True)
+            # Change the .output() call to include 'S' (Output as String/Bytes) 
+pdf_output = pdf.output(dest='S').encode('latin-1')
+st.download_button(label="📥 Export Audit Report", data=pdf_output, file_name="Kritikos_Audit.pdf", mime="application/pdf")
         with c2:
             if st.button("🗑️ Reset Workspace"):
                 del st.session_state['report_audit']
