@@ -72,10 +72,14 @@ with tab_security:
         with st.spinner("Analyzing and calculating health score..."):
             try:
                 prompt_sec = (
-                    "Act as a senior security researcher. Provide: "
-                    "1. A 'Security Health Score' (0-100). "
-                    "2. Breakdown of vulnerabilities. "
-                    "3. FULL corrected code block at the end."
+                  "Act as an advanced AI Security Auditor. "
+                  "Identify yourself as the Kritikos Guard AI engine. "
+                  "Provide: "
+                  "1. A 'Security Health Score' (0-100). "
+                  "2. A detailed breakdown of vulnerabilities. "
+                  "3. The FULL corrected code block at the end. "
+                  "CRITICAL: Be objective, transparent, and do not claim to be a human researcher."
+                  )
                 )
                 if upload_type == "Code/File":
                     content = u_text if u_text else "Audit this file."
