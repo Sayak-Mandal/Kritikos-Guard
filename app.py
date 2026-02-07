@@ -207,15 +207,40 @@ with tab_audit:
 
 # --- TAB 2: GRAMMAR ---
 with tab_grammar:
-    st.markdown("### ✍️ Executive Communication Refinement")
-    g_input = st.text_area("Paste Draft Communication:", height=200, key="g_input", placeholder="e.g., where is they now? when was they return?")
+    st.markdown("### ✍️ Writing Ally")
+    
+    # 1. Added 'key="writing_input"' so we can control it
+    g_input = st.text_area(
+        "Paste your text here:", 
+        height=150, 
+        key="writing_input",  # This is the secret to resetting it
+        placeholder="e.g., Please enter your text here."
+    )
     
     col_t, col_a = st.columns(2)
     with col_t: 
-        tone = st.selectbox("Persona:", ["Executive", "Direct", "Friendly"], key="g_tone")
+        tone = st.selectbox("Select Tone:", ["Formal", "Direct", "Casual"], key="g_tone")
     with col_a: 
-        # Renamed to Architect Mode for a modern vibe
-        action = st.radio("Optimization:", ["Little Fix", "Full Rebuild"], horizontal=True)
+        action = st.radio("Correction Level:", ["Standard Fix", "Zen Mode(Clean & Minimilastic"], horizontal=True)
+
+    if st.button("✨ REFINE TEXT"):
+        if not g_input: 
+            st.warning("Please enter some text first.")
+        else:
+            # ... (Your existing AI logic here)
+            # Make sure to use client.models.generate_content(model=..., contents=...)
+            pass
+
+    # 2. The Updated Reset Button
+    if st.button("🗑️ Reset Writing Ally"):
+        # This clears the text area and the previous result
+        if 'writing_input' in st.session_state:
+            st.session_state['writing_input'] = ""
+        if 'report_grammar' in st.session_state:
+            del st.session_state['report_grammar']
+        
+        # This forces the page to refresh and show the empty boxes
+        st.rerun()
 
     if st.button("✨ REFINE COMMUNICATION"):
         if not g_input: 
