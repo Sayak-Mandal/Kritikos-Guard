@@ -117,10 +117,10 @@ with st.sidebar:
     st.info(f"Engine: {CURRENT_MODEL}")
 
 # --- 4. MAIN UI ---
-st.title("🛡️ Kritikos Guard: Enterprise IT Suite")
+st.title("🛡️ Kritikos Guard: Code & Clarity Hub")
 st.markdown("---")
 
-tab_audit, tab_grammar = st.tabs(["🔍 Security Discerner", "✍️ Executive Polisher"])
+tab_audit, tab_grammar = st.tabs(["🔍 Security Discerner", "✍️ Writing Companion"])
 
 # --- TAB 1: SECURITY AUDITOR ---
 with tab_audit:
@@ -212,10 +212,10 @@ with tab_grammar:
     
     col_t, col_a = st.columns(2)
     with col_t: 
-        tone = st.selectbox("Persona:", ["Executive", "Direct", "Colloquial"], key="g_tone")
+        tone = st.selectbox("Persona:", ["Executive", "Direct", "Friendly"], key="g_tone")
     with col_a: 
         # Renamed to Architect Mode for a modern vibe
-        action = st.radio("Optimization:", ["Grammar Check", "Architect Mode"], horizontal=True)
+        action = st.radio("Optimization:", ["Little Fix", "Full Rebuild"], horizontal=True)
 
     if st.button("✨ REFINE COMMUNICATION"):
         if not g_input: 
