@@ -1,6 +1,5 @@
 import streamlit as st
 from google import genai
-from google.genai import types # Needed for image processing
 import os
 from fpdf import FPDF
 from PIL import Image
@@ -13,14 +12,14 @@ def reset_writing_ally():
     if 'report_grammar' in st.session_state:
         st.session_state['report_grammar'] = ""
 
-# --- 2. API KEY SETUP (Restoring your automatic setup) ---
+# --- 2. API SETUP ---
 api_key = st.secrets.get("GEMINI_API_KEY")
 if not api_key:
     with st.sidebar:
         api_key = st.text_input("Enter Gemini API Key:", type="password")
 
 if not api_key:
-    st.warning("Please provide an API key to continue.")
+    st.warning("Please provide an API key.")
     st.stop()
 
 client = genai.Client(api_key=api_key)
@@ -29,58 +28,81 @@ client = genai.Client(api_key=api_key)
 st.title("🛡️ Smart Developer Toolkit")
 tab_security, tab_grammar = st.tabs(["🛡️ Security Scan", "✍️ Writing Ally"])
 
-# --- TAB 1: SECURITY SCAN (RESTORED TEXT & IMAGE) ---
+# --- TAB 1: SECURITY SCAN (RESTORED SCORE & PREVIEW) ---
 with tab_security:
     st.markdown("### 🔍 Security Discerner")
     
-    # Restoring the choice between Code/Text and Image
-    upload_type = st.radio("Upload Type:", ["Code/File", "UI Screenshot/Image"], horizontal=True)
+    upload_type = st.radio("Audit Type:", ["Code/File", "UI Screenshot"], horizontal=True)
     
     if upload_type == "Code/File":
-        uploaded_file = st.file_uploader("Upload Code (py, js, txt, pdf):", type=["py", "js", "txt", "pdf"])
-        user_text = st.text_area("Or paste code here:")
+        u_file = st.file_uploader("Upload Script:", type=["py", "js", "txt", "pdf"])
+        u_text = st.text_area("Or Paste Code Snippet:")
     else:
-        uploaded_image = st.file_uploader("Upload UI Screenshot:", type=["jpg", "jpeg", "png"])
+        u_img = st.file_uploader("Upload UI Screenshot:", type=["jpg", "png", "jpeg"])
 
     if st.button("🚀 RUN AUDIT"):
-        with st.spinner("Analyzing..."):
+        with st.spinner("Calculating Security Health Score..."):
             try:
+                # Prompt that forces the Score and Corrected Code block
+                prompt_sec = (
+                    "Analyze the following for security. "
+                    "1. Give a 'Security Health Score' out of 100. "
+                    "2. List vulnerabilities. "
+                    "3. Provide the FULL CORRECTED CODE block at the end."
+                )
+                
                 if upload_type == "Code/File":
-                    # Logic for text/file audit
-                    content = user_text if user_text else "Check this file for bugs."
-                    resp = client.models.generate_content(model="gemini-2.5-flash", contents=content)
+                    content = u_text if u_text else "Check this file."
+                    resp = client.models.generate_content(model="gemini-2.0-flash", contents=[content, prompt_sec])
                 else:
-                    # Logic for Image/Multimodal audit
-                    img = Image.open(uploaded_image)
-                    resp = client.models.generate_content(model="gemini-2.5-flash", contents=[img, "Identify security flaws in this UI."])
+                    img = Image.open(u_img)
+                    resp = client.models.generate_content(model="gemini-2.0-flash", contents=[img, prompt_sec])
                 
                 st.session_state['report_security'] = resp.text
             except Exception as e:
                 st.error(f"Audit Error: {e}")
 
     if st.session_state.get('report_security'):
+        st.divider()
+        # Displaying the Score and Audit
         st.markdown(st.session_state['report_security'])
+        
+        # RESTORED DOWNLOAD BUTTON
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+        pdf.multi_cell(0, 10, txt=st.session_state['report_security'].encode('latin-1', 'replace').decode('latin-1'))
+        pdf_bytes = pdf.output(dest='S').encode('latin-1')
+        st.download_button("📥 Download Security Audit (PDF)", data=pdf_bytes, file_name="Security_Audit.pdf")
 
-# --- TAB 2: WRITING ALLY (STAYS CLEAN) ---
+# --- TAB 2: WRITING ALLY (RESTORED CODE PREVIEW & DOWNLOAD) ---
 with tab_grammar:
     st.markdown("### ✍️ Writing Ally")
-    g_input = st.text_area("Paste text here:", height=150, key="writing_input")
+    g_input = st.text_area("Input Text:", height=150, key="writing_input")
     
     col_t, col_a = st.columns(2)
-    with col_t: 
-        tone = st.selectbox("Tone:", ["Formal", "Direct", "Casual"], key="g_tone")
-    with col_a: 
-        action = st.radio("Mode:", ["Standard Fix", "Zen Mode"], key="g_action", horizontal=True)
+    with col_t: tone = st.selectbox("Tone:", ["Formal", "Neutral", "Casual"], key="g_tone")
+    with col_a: action = st.radio("Mode:", ["Standard Fix", "Zen Mode"], key="g_action", horizontal=True)
 
     if st.button("✨ REFINE TEXT"):
-        # ... (Clean prompt logic we built earlier)
-        prompt = f"Task: {action}\nTone: {tone}\nInput: '{g_input}'\nOutput ONLY the result."
-        resp = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-        st.session_state['report_grammar'] = resp.text
-        st.rerun()
+        with st.spinner("Refining..."):
+            prompt = f"Task: {action}\nTone: {tone}\nInput: '{g_input}'\nOutput ONLY the result."
+            resp = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+            st.session_state['report_grammar'] = resp.text
+            st.rerun()
 
     st.button("🗑️ Reset Writing Ally", on_click=reset_writing_ally)
     
     if st.session_state.get('report_grammar'):
         st.divider()
+        st.markdown("#### ✅ Corrected Preview:")
+        # RESTORED PREVIEW BOX
         st.code(st.session_state['report_grammar'], language=None)
+        
+        # RESTORED DOWNLOAD BUTTON FOR CORRECTED TEXT
+        st.download_button(
+            label="📥 Download Refined Text",
+            data=st.session_state['report_grammar'],
+            file_name="Refined_Text.txt",
+            mime="text/plain"
+        )
