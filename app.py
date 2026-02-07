@@ -1,6 +1,7 @@
 import streamlit as st
 from google import genai
 import os
+import re
 from fpdf import FPDF
 from PIL import Image
 
@@ -9,19 +10,22 @@ st.set_page_config(page_title="Kritikos Guard | Pro Developer Hub", layout="wide
 
 # The function that clears EVERYTHING
 def global_reset():
-    # Clear the session state
     for key in list(st.session_state.keys()):
         del st.session_state[key]
-    # REMOVED st.rerun() - Streamlit does this automatically on button click
 
 # Callback for just the Writing Ally
 def reset_writing_ally():
     st.session_state['writing_input'] = ""
     if 'report_grammar' in st.session_state:
         st.session_state['report_grammar'] = ""
-    # REMOVED st.rerun()
 
-# --- 2. SIDEBAR (Restored Status & Privacy) ---
+# Initialize Session State
+if 'report_security' not in st.session_state:
+    st.session_state['report_security'] = None
+if 'report_grammar' not in st.session_state:
+    st.session_state['report_grammar'] = ""
+
+# --- 2. SIDEBAR (Status & Privacy) ---
 with st.sidebar:
     st.title("🛡️ Kritikos Guard")
     st.markdown("---")
@@ -31,7 +35,6 @@ with st.sidebar:
     if not api_key:
         api_key = st.text_input("Enter Gemini API Key:", type="password")
     
-    # Restored Status Indicators
     if api_key:
         st.success("✅ Connection Active")
         st.info("Engine: gemini-2.5-flash")
@@ -39,7 +42,6 @@ with st.sidebar:
         st.error("❌ Key Required")
     
     st.markdown("---")
-    # Restored Privacy Assurance
     st.markdown("### 🔒 Privacy First")
     st.caption("We do **not** store your code, images, or text. All processing is done in real-time via the Gemini API.")
     
@@ -56,7 +58,7 @@ client = genai.Client(api_key=api_key)
 st.title("🛡️ Smart Developer Toolkit")
 tab_security, tab_grammar = st.tabs(["🛡️ Security Scan", "✍️ Writing Ally"])
 
-# --- TAB 1: SECURITY SCAN (Restored Score & Multimodal) ---
+# --- TAB 1: SECURITY SCAN ---
 with tab_security:
     st.markdown("### 🔍 Security Discerner")
     
@@ -71,14 +73,11 @@ with tab_security:
     if st.button("🚀 RUN AUDIT"):
         with st.spinner("Analyzing and calculating health score..."):
             try:
+                # Prompt ensuring the AI identifies correctly
                 prompt_sec = (
-                  "Act as an advanced AI Security Auditor. "
-                  "Identify yourself as the Kritikos Guard AI engine. "
-                  "Provide: "
-                  "1. A 'Security Health Score' (0-100). "
-                  "2. A detailed breakdown of vulnerabilities. "
-                  "3. The FULL corrected code block at the end. "
-                  "CRITICAL: Be objective, transparent, and do not claim to be a human researcher."
+                    "Act as an advanced AI Security Auditor. Identify yourself as Kritikos Guard AI. "
+                    "Provide: 1. A 'Security Health Score' (0-100). "
+                    "2. Breakdown of vulnerabilities. 3. FULL corrected code block at the end."
                 )
                 if upload_type == "Code/File":
                     content = u_text if u_text else "Audit this file."
@@ -91,43 +90,36 @@ with tab_security:
             except Exception as e:
                 st.error(f"Audit Error: {e}")
 
+    # Results Display with Visual Health Meter
     if st.session_state.get('report_security'):
         st.divider()
+        
+        # VISUAL HEALTH METER LOGIC
+        score_match = re.search(r"Score[:\s]*(\d+)", st.session_state['report_security'])
+        if score_match:
+            score = int(score_match.group(1))
+            st.write(f"### 🛡️ Security Health Score: {score}/100")
+            if score >= 80:
+                st.progress(score / 100)
+                st.success("🟢 Code follows strong security patterns.")
+            elif score >= 50:
+                st.progress(score / 100)
+                st.warning("🟡 Moderate risks identified.")
+            else:
+                st.progress(score / 100)
+                st.error("🔴 Critical vulnerabilities detected.")
+
         st.markdown(st.session_state['report_security'])
         
-        # PDF Download
+        # PDF Export
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
         pdf.multi_cell(0, 10, txt=st.session_state['report_security'].encode('latin-1', 'replace').decode('latin-1'))
         pdf_bytes = pdf.output(dest='S').encode('latin-1')
         st.download_button("📥 Download Audit (PDF)", data=pdf_bytes, file_name="Security_Audit.pdf")
-        if st.session_state.get('report_security'):
-        st.divider()
-        
-        # --- NEW VISUAL HEALTH METER START ---
-        # This regex looks for a number after the word 'Score' in the AI's response
-        import re
-        score_match = re.search(r"Score[:\s]*(\d+)", st.session_state['report_security'])
-        if score_match:
-            score = int(score_match.group(1))
-            st.write(f"### 🛡️ Security Health Score: {score}/100")
-            
-            # Change color based on score
-            if score >= 80:
-                st.progress(score / 100)
-                st.success("🟢 Your code follows strong security patterns.")
-            elif score >= 50:
-                st.progress(score / 100)
-                st.warning("🟡 Moderate risks identified. See breakdown below.")
-            else:
-                st.progress(score / 100)
-                st.error("🔴 Critical vulnerabilities detected. Immediate fix required.")
-        # --- NEW VISUAL HEALTH METER END ---
 
-        st.markdown(st.session_state['report_security'])
-
-# --- TAB 2: WRITING ALLY (Restored Preview & Clear) ---
+# --- TAB 2: WRITING ALLY ---
 with tab_grammar:
     st.markdown("### ✍️ Writing Ally")
     g_input = st.text_area("Draft Text:", height=150, key="writing_input")
@@ -143,14 +135,13 @@ with tab_grammar:
             st.session_state['report_grammar'] = resp.text
             st.rerun()
 
-    # Specific reset for this tab
     st.button("🗑️ Reset Writing Ally", on_click=reset_writing_ally)
     
     if st.session_state.get('report_grammar'):
         st.divider()
         st.code(st.session_state['report_grammar'], language=None)
-        st.download_button("📥 Download Text", data=st.session_state['report_grammar'], file_name="Refined.txt")
+        st.download_button("📥 Download Refined Text", data=st.session_state['report_grammar'], file_name="Refined.txt")
 
-# --- 4. GLOBAL RESET (Bottom of Page) ---
+# --- 4. GLOBAL RESET ---
 st.divider()
-st.button("🔄 GLOBAL SYSTEM RESET", on_click=global_reset, help="Clear all files, text, and reports to start fresh.")
+st.button("🔄 GLOBAL SYSTEM RESET", on_click=global_reset)
