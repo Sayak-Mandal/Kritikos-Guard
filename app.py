@@ -52,7 +52,7 @@ with tab_security:
                 else:
                     # Logic for Image/Multimodal audit
                     img = Image.open(uploaded_image)
-                    resp = client.models.generate_content(model="gemini-2.0-flash", contents=[img, "Identify security flaws in this UI."])
+                    resp = client.models.generate_content(model="gemini-2.5-flash", contents=[img, "Identify security flaws in this UI."])
                 
                 st.session_state['report_security'] = resp.text
             except Exception as e:
