@@ -220,7 +220,7 @@ with tab_grammar:
             with st.spinner("Processing..."):
                 try:
                     client = genai.Client(api_key=api_key)
-                    resp = client.models.generate_content(model=CURRENT_MODEL, # Create a strict constraint-based prompt
+                    resp = client.models.generate_content(model=CURRENT_MODEL) # Create a strict constraint-based prompt
                     prompt = ( f"Task: {action}\n"
                               f"Tone: {style}\n"
                               f"Input: '{g_input}'\n"
