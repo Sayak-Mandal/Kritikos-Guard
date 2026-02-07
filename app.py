@@ -27,10 +27,12 @@ with st.sidebar:
     st.divider()
     st.markdown("### About\nA polite, modern security auditor and writing companion for the next generation of IT professionals.")
 
-# Ensure API Key is present
+# Try to get the key from secrets first (Your existing setup)
+api_key = st.secrets.get("GEMINI_API_KEY")
+
+# If it's still missing, show the input box as a backup
 if not api_key:
-    st.warning("Please enter your Gemini API Key in the sidebar to begin.")
-    st.stop()
+    api_key = st.text_input("Enter Gemini API Key:", type="password")
 
 # --- 3. MAIN INTERFACE ---
 st.title("🛡️ Smart Developer Toolkit")
