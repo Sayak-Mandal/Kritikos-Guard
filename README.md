@@ -18,7 +18,7 @@ Kritikos Guard is a high-performance "Digital Sentinel" built to bridge the gap 
 * **Libraries:** `google-genai`, `PyPDF2`, `fpdf`, `Pillow`
 
 ## Security Scoring Formula
-$$Security Score = 100 - (C \times 40 + M \times 15 + L \times 5)$$
+$$Security\__Score = 100 - (C \times 40 + M \times 15 + L \times 5)$$
 *Where C=Critical, M=Medium, L=Low risks.*
 
 ## How to Run
