@@ -53,10 +53,10 @@ with tab_security:
                 
                 if upload_type == "Code/File":
                     content = u_text if u_text else "Check this file."
-                    resp = client.models.generate_content(model="gemini-2.0-flash", contents=[content, prompt_sec])
+                    resp = client.models.generate_content(model="gemini-2.5-flash", contents=[content, prompt_sec])
                 else:
                     img = Image.open(u_img)
-                    resp = client.models.generate_content(model="gemini-2.0-flash", contents=[img, prompt_sec])
+                    resp = client.models.generate_content(model="gemini-2.5-flash", contents=[img, prompt_sec])
                 
                 st.session_state['report_security'] = resp.text
             except Exception as e:
@@ -87,7 +87,7 @@ with tab_grammar:
     if st.button("✨ REFINE TEXT"):
         with st.spinner("Refining..."):
             prompt = f"Task: {action}\nTone: {tone}\nInput: '{g_input}'\nOutput ONLY the result."
-            resp = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+            resp = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
             st.session_state['report_grammar'] = resp.text
             st.rerun()
 
