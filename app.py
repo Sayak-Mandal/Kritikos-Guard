@@ -205,78 +205,57 @@ with tab_audit:
                 st.session_state['audit_u_key'] += 1
                 st.rerun()
 
-# --- TAB 2: GRAMMAR ---
+# --- TAB 2: WRITING ALLY ---
 with tab_grammar:
     st.markdown("### ✍️ Writing Ally")
     
-    # 1. Added 'key="writing_input"' so we can control it
+    # Text area with the correct key for resetting
     g_input = st.text_area(
         "Paste your text here:", 
         height=150, 
-        key="writing_input",  # This is the secret to resetting it
-        placeholder="e.g., Please enter your text here."
+        key="writing_input", 
+        placeholder="e.g., where is they now? when was they return?"
     )
     
     col_t, col_a = st.columns(2)
     with col_t: 
-        tone = st.selectbox("Select Tone:", ["Formal", "Direct", "Casual"], key="g_tone")
+        tone = st.selectbox("Select Tone:", ["Formal", "Neutral", "Casual"], key="g_tone")
     with col_a: 
-        action = st.radio("Correction Level:", ["Standard Fix", "Zen Mode(Clean & Minimilastic"], horizontal=True)
+        # Zen Mode for that modern, high-tier vibe
+        action = st.radio("Correction Level:", ["Standard Fix", "Zen Mode"], key="g_action", horizontal=True)
 
+    # The single, main action button
     if st.button("✨ REFINE TEXT"):
-        if not g_input: 
-            st.warning("Please enter some text first.")
-        else:
-            # ... (Your existing AI logic here)
-            # Make sure to use client.models.generate_content(model=..., contents=...)
-            pass
-
-    # 2. The Updated Reset Button
-    if st.button("🗑️ Reset Writing Ally"):
-        # This clears the text area and the previous result
-        if 'writing_input' in st.session_state:
-            st.session_state['writing_input'] = ""
-        if 'report_grammar' in st.session_state:
-            del st.session_state['report_grammar']
-        
-        # This forces the page to refresh and show the empty boxes
-        st.rerun()
-
-    if st.button("✨ REFINE COMMUNICATION"):
         if not g_input: 
             st.warning("Please enter some text to refine.")
         else:
-            with st.spinner("Refining..."):
+            with st.spinner("Processing with Gemini 2.0 Flash..."):
                 try:
-                    # Initialize client
                     client = genai.Client(api_key=api_key)
                     
-                    # Modern Sentinel Prompt to prevent chatter
                     prompt = (
                         f"Task: {action}\n"
                         f"Tone: {tone}\n"
                         f"Input: '{g_input}'\n"
-                        "CRITICAL: Output ONLY the corrected text. Do NOT explain, "
-                        "do NOT use quotes, and do NOT add intro/outro text."
+                        "CRITICAL: Output ONLY the corrected text. Do NOT explain. Do NOT use quotes."
                     )
 
-                    # KEYWORD FIX: Added model= and contents=
+                    # CORRECT MODEL NAME
                     resp = client.models.generate_content(
                         model="gemini-2.5-flash", 
                         contents=prompt
                     )
                     
                     st.session_state['report_grammar'] = resp.text
+                    st.rerun() 
                 except Exception as e: 
-                    st.error(f"Technical Error: {e}")
+                    st.error(f"Model Error: {e}. (Ensure you use 'gemini-2.5-flash')")
+
+    # Use 'on_click' to trigger the reset function we defined earlier
+    st.button("🗑️ Reset Writing Ally", on_click=reset_writing_ally)
 
     # Display Result
-    if 'report_grammar' in st.session_state:
+    if 'report_grammar' in st.session_state and st.session_state['report_grammar']:
         st.divider()
         st.success("✅ Refined Version:")
-        # Displaying in a code block or text area makes it easy to copy
         st.code(st.session_state['report_grammar'], language=None)
-        
-        if st.button("🗑️ Clear Result"):
-            del st.session_state['report_grammar']
-            st.rerun()
