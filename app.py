@@ -130,26 +130,37 @@ with tab_grammar:
     g_input = st.text_area("Draft Text:", height=150, key=f"writing_input_{v}")
     
     col_t, col_a = st.columns(2)
-    with col_t: tone = st.selectbox("Tone:", ["Formal", "Neutral", "Casual"], key=f"tone_{v}")
-    with col_a: action = st.radio("Mode:", ["Standard Fix", "Zen Mode"], key=f"action_{v}", horizontal=True)
+    with col_t: 
+        tone = st.selectbox("Tone:", ["Formal", "Neutral", "Casual"], key=f"tone_{v}")
+    with col_a: 
+        action = st.radio("Mode:", ["Standard Fix", "Zen Mode"], key=f"action_{v}", horizontal=True)
 
     if st.button("✨ REFINE TEXT", key=f"refine_btn_{v}"):
-        with st.spinner("Polishing..."):
-            prompt = f"Task: {action}\nTone: {tone}\nInput: '{g_input}'\nOutput ONLY the result."
-            resp = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-            st.session_state['report_grammar'] = resp.text
-            st.rerun()
+        with st.spinner("Polishing with Gemini 3.0..."):
+            try:
+                prompt = f"Tone: {tone}\nInput: '{g_input}'\nOutput ONLY the result."
+                resp = client.models.generate_content(model="gemini-3.0-flash", contents=prompt)
+                st.session_state['report_grammar'] = resp.text
+                st.rerun()
+            except Exception as e:
+                st.error(f"Error: {e}")
 
+    # Indent these lines exactly the same as the 'if st.button' above
     st.button("🗑️ Reset Writing Ally", on_click=reset_writing_ally, key=f"reset_writing_{v}")
     
-   if st.session_state.get('report_grammar'):
+    if st.session_state.get('report_grammar'):
         st.divider()
         st.markdown("#### ✅ Refined Output (Copyable)")
         
-        # ADD THIS: wrap_lines=True prevents horizontal scrolling
+        # wrap_lines=True stops the horizontal scrolling issue
         st.code(st.session_state['report_grammar'], language=None, wrap_lines=True)
         
-        st.download_button("📥 Download Text", data=st.session_state['report_grammar'], file_name="Refined.txt", key=f"dl_txt_{v}")
+        st.download_button(
+            label="📥 Download Text", 
+            data=st.session_state['report_grammar'], 
+            file_name="Refined.txt", 
+            key=f"dl_txt_{v}"
+        )
 
 # --- 4. GLOBAL RESET ---
 st.divider()
