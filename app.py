@@ -142,10 +142,13 @@ with tab_grammar:
 
     st.button("🗑️ Reset Writing Ally", on_click=reset_writing_ally, key=f"reset_writing_{v}")
     
-    if st.session_state.get('report_grammar'):
+   if st.session_state.get('report_grammar'):
         st.divider()
         st.markdown("#### ✅ Refined Output (Copyable)")
-        st.code(st.session_state['report_grammar'], language=None)
+        
+        # ADD THIS: wrap_lines=True prevents horizontal scrolling
+        st.code(st.session_state['report_grammar'], language=None, wrap_lines=True)
+        
         st.download_button("📥 Download Text", data=st.session_state['report_grammar'], file_name="Refined.txt", key=f"dl_txt_{v}")
 
 # --- 4. GLOBAL RESET ---
