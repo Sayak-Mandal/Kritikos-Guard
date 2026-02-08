@@ -133,27 +133,42 @@ with tab_grammar:
     g_input = st.text_area("Draft Text:", height=150, key="writing_input")
     
     col_t, col_a = st.columns(2)
-    with col_t: tone = st.selectbox("Tone:", ["Formal", "Neutral", "Casual"], key="g_tone")
-    with col_a: action = st.radio("Mode:", ["Standard Fix", "Zen Mode"], key="g_action", horizontal=True)
+    with col_t: 
+        tone = st.selectbox("Tone:", ["Formal", "Neutral", "Casual"], key="g_tone")
+    with col_a: 
+        action = st.radio("Mode:", ["Standard Fix", "Zen Mode"], key="g_action", horizontal=True)
 
     if st.button("✨ REFINE TEXT"):
-        with st.spinner("Polishing..."):
-            prompt = f"Task: {action}\nTone: {tone}\nInput: '{g_input}'\nOutput ONLY the result."
-            resp = client.models.generate_content(model="gemini-3-flash-preview", contents=prompt)
-            st.session_state['report_grammar'] = resp.text
-            st.rerun()
+        with st.spinner("Polishing with Gemini 3 Flash..."):
+            try:
+                # Prompt ensuring no chatter
+                prompt = f"Task: {action}\nTone: {tone}\nInput: '{g_input}'\nOutput ONLY the result."
+                resp = client.models.generate_content(model="gemini-3-flash", contents=prompt)
+                st.session_state['report_grammar'] = resp.text
+                st.rerun()
+            except Exception as e:
+                st.error(f"Error: {e}")
 
+    # Specific reset for this tab
     st.button("🗑️ Reset Writing Ally", on_click=reset_writing_ally)
     
-   if st.session_state.get('report_grammar'):
+    # This is the section that was causing your Indentation Error
+    if st.session_state.get('report_grammar'):
         st.divider()
-        st.markdown("#### ✅ Refined Output")
+        st.markdown("#### ✅ Refined Output (Copyable)")
         
-        # This creates the box with the built-in copy button
+        # st.code provides the built-in COPY BUTTON in the top right
         st.code(st.session_state['report_grammar'], language=None)
         
-        # Keep your download button for files
-        st.download_button("📥 Download .txt", data=st.session_state['report_grammar'], file_name="Refined.txt")
+        st.download_button(
+            label="📥 Download as Text File", 
+            data=st.session_state['report_grammar'], 
+            file_name="Refined_Text.txt"
+        )
+
+# --- 4. GLOBAL RESET (At the very bottom, outside of any tabs) ---
+st.divider()
+st.button("🔄 GLOBAL SYSTEM RESET", on_click=global_reset)
 
 # --- 4. GLOBAL RESET ---
 st.divider()
