@@ -90,56 +90,37 @@ with tab_security:
             except Exception as e:
                 st.error(f"Audit Error: {e}")
 
+   # Results Display
     if st.session_state.get('report_security'):
         st.divider()
         
-        # 1. Display the Visual Health Meter first (as we set up before)
-        # ... (meter logic here) ...
-
-        # 2. Extract the code block if it exists, otherwise show the full report
+        # 1. VISUAL HEALTH METER
+        # We search the AI response for the score to drive the progress bar
         import re
-        report_text = st.session_state['report_security']
+        score_match = re.search(r"Score.*?(\d+)", st.session_state['report_security'], re.IGNORECASE)
         
-        # This regex looks for code between triple backticks
-        code_blocks = re.findall(r"```(?:\w+)?\n(.*?)\n```", report_text, re.DOTALL)
-        
-        if code_blocks:
-            # Display the explanation text (everything before the code)
-            explanation = report_text.split("```")[0]
-            st.markdown(explanation)
-            
-            st.info("📋 **Corrected Code Fix:**")
-            # Display ONLY the code in the copyable box
-            for block in code_blocks:
-                st.code(block, language="python")
-                
-            # Display anything that came after the code block
-            footer = report_text.split("```")[-1]
-            if footer.strip():
-                st.markdown(footer)
-        else:
-            # Fallback: if no backticks found, show everything in markdown
-            st.markdown(report_text)
-        
-        # VISUAL HEALTH METER LOGIC
-        # This version looks for the number anywhere near the word 'Score'
-        score_match = re.search(r"Score.*?\b(\d{1,3})\b", st.session_state['report_security'], re.IGNORECASE)
         if score_match:
             score = int(score_match.group(1))
             st.write(f"### 🛡️ Security Health Score: {score}/100")
-            if score >= 80:
-                st.progress(score / 100)
-                st.success("🟢 Code follows strong security patterns.")
-            elif score >= 50:
-                st.progress(score / 100)
-                st.warning("🟡 Moderate risks identified.")
-            else:
-                st.progress(score / 100)
-                st.error("🔴 Critical vulnerabilities detected.")
+            st.progress(score / 100)
+            
+            if score >= 80: st.success("🟢 Code follows strong security patterns.")
+            elif score >= 50: st.warning("🟡 Moderate risks identified.")
+            else: st.error("🔴 CRITICAL VULNERABILITIES DETECTED")
 
+        # 2. THE FULL AUDIT REPORT
+        # This displays the AI's text (Vulnerabilities + Explanations)
         st.markdown(st.session_state['report_security'])
         
-        # PDF Export
+        # 3. THE "QUICK COPY" BOX (NEW FEATURE)
+        # We extract ONLY the code block from the AI's response so it's clean
+        code_blocks = re.findall(r"```(?:\w+)?\n(.*?)\n```", st.session_state['report_security'], re.DOTALL)
+        if code_blocks:
+            st.info("📋 **Quick Copy Fix:** Use the button in the top-right to copy the corrected code.")
+            # We show the last code block (the fix) in a copyable window
+            st.code(code_blocks[-1], language="python")
+
+        # 4. DOWNLOAD BUTTON (Preserved)
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
