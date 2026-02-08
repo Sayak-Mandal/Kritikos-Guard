@@ -90,9 +90,16 @@ with tab_security:
             except Exception as e:
                 st.error(f"Audit Error: {e}")
 
-    # Results Display with Visual Health Meter
     if st.session_state.get('report_security'):
         st.divider()
+        # ... (Health Meter logic stays here) ...
+
+        # Display the full report
+        st.markdown(st.session_state['report_security'])
+        
+        # ADD THIS: A dedicated "Copy Fix" area
+        st.info("📋 **Quick Copy:** Use the button in the top-right of the box below to copy the corrected code.")
+        st.code(st.session_state['report_security'], language="python")
         
         # VISUAL HEALTH METER LOGIC
         # This version looks for the number anywhere near the word 'Score'
@@ -138,10 +145,15 @@ with tab_grammar:
 
     st.button("🗑️ Reset Writing Ally", on_click=reset_writing_ally)
     
-    if st.session_state.get('report_grammar'):
+   if st.session_state.get('report_grammar'):
         st.divider()
+        st.markdown("#### ✅ Refined Output")
+        
+        # This creates the box with the built-in copy button
         st.code(st.session_state['report_grammar'], language=None)
-        st.download_button("📥 Download Refined Text", data=st.session_state['report_grammar'], file_name="Refined.txt")
+        
+        # Keep your download button for files
+        st.download_button("📥 Download .txt", data=st.session_state['report_grammar'], file_name="Refined.txt")
 
 # --- 4. GLOBAL RESET ---
 st.divider()
