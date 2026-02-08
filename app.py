@@ -79,7 +79,7 @@ with tab_security:
         with st.spinner("Gemini 3 Flash is auditing..."):
             try:
                 prompt_sec = (
-                    "Act as an advanced AI Security Auditor 'Kritikos Guard'. "
+                    "Act as an advanced AI Security Auditor 'Kritikos'. "
                     "Analyze the input and provide: 1. A 'Security Health Score' (0-100). "
                     "2. Breakdown of vulnerabilities. 3. A FULL corrected code fix wrapped in triple backticks."
                 )
