@@ -34,7 +34,7 @@ v = st.session_state['reset_counter']
 
 # --- 2. SIDEBAR ---
 with st.sidebar:
-    st.title("🛡️ Kritikos Guard")
+    st.title("🛡️ Kritikos")
     st.markdown("---")
     
     api_key = st.secrets.get("GEMINI_API_KEY")
