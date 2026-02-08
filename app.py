@@ -92,14 +92,34 @@ with tab_security:
 
     if st.session_state.get('report_security'):
         st.divider()
-        # ... (Health Meter logic stays here) ...
-
-        # Display the full report
-        st.markdown(st.session_state['report_security'])
         
-        # ADD THIS: A dedicated "Copy Fix" area
-        st.info("📋 **Quick Copy:** Use the button in the top-right of the box below to copy the corrected code.")
-        st.code(st.session_state['report_security'], language="python")
+        # 1. Display the Visual Health Meter first (as we set up before)
+        # ... (meter logic here) ...
+
+        # 2. Extract the code block if it exists, otherwise show the full report
+        import re
+        report_text = st.session_state['report_security']
+        
+        # This regex looks for code between triple backticks
+        code_blocks = re.findall(r"```(?:\w+)?\n(.*?)\n```", report_text, re.DOTALL)
+        
+        if code_blocks:
+            # Display the explanation text (everything before the code)
+            explanation = report_text.split("```")[0]
+            st.markdown(explanation)
+            
+            st.info("📋 **Corrected Code Fix:**")
+            # Display ONLY the code in the copyable box
+            for block in code_blocks:
+                st.code(block, language="python")
+                
+            # Display anything that came after the code block
+            footer = report_text.split("```")[-1]
+            if footer.strip():
+                st.markdown(footer)
+        else:
+            # Fallback: if no backticks found, show everything in markdown
+            st.markdown(report_text)
         
         # VISUAL HEALTH METER LOGIC
         # This version looks for the number anywhere near the word 'Score'
