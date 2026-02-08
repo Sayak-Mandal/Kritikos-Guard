@@ -139,7 +139,7 @@ with tab_grammar:
         with st.spinner("Polishing with Gemini 3.0..."):
             try:
                 prompt = f"Tone: {tone}\nInput: '{g_input}'\nOutput ONLY the result."
-                resp = client.models.generate_content(model="gemini-3.0-flash", contents=prompt)
+                resp = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
                 st.session_state['report_grammar'] = resp.text
                 st.rerun()
             except Exception as e:
