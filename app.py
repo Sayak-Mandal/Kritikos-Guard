@@ -166,10 +166,10 @@ with tab_grammar:
             file_name="Refined_Text.txt"
         )
 
-# --- 4. GLOBAL RESET (At the very bottom, outside of any tabs) ---
+# --- 4. GLOBAL RESET (Ensuring Unique ID) ---
 st.divider()
-st.button("🔄 GLOBAL SYSTEM RESET", on_click=global_reset)
+st.info("💡 Tip: Use the Global Reset to clear all session data before a new audit.")
 
-# --- 4. GLOBAL RESET ---
-st.divider()
-st.button("🔄 GLOBAL SYSTEM RESET", on_click=global_reset)
+# Adding a unique key prevents the 'DuplicateElementId' error
+if st.button("🔄 GLOBAL SYSTEM RESET", on_click=global_reset, key="unique_global_reset"):
+    st.toast("System Wiped!", icon="🧹")
