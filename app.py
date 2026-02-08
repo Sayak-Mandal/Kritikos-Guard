@@ -6,7 +6,7 @@ from fpdf import FPDF
 from PIL import Image
 
 # --- 1. CONFIGURATION & STATE MANAGEMENT ---
-st.set_page_config(page_title="Kritikos Guard | Pro Developer Hub", layout="wide")
+st.set_page_config(page_title="Kritikos | Pro Developer Hub", layout="wide")
 
 # Initialize Session State
 if 'reset_counter' not in st.session_state:
@@ -51,7 +51,7 @@ with st.sidebar:
     st.markdown("### 🔒 Privacy First")
     st.caption("We do **not** store your code, images, or text. All processing is done in real-time.")
     st.divider()
-    st.markdown("**Version 3.0** | Gemini 3 Hackathon Edition")
+    st.markdown("**Version 1.0** | Gemini 3 Edition")
 
 if not api_key:
     st.warning("Please provide an API key in the sidebar to begin.")
@@ -139,7 +139,7 @@ with tab_grammar:
         with st.spinner("Polishing with Gemini 3.0..."):
             try:
                 prompt = f"Tone: {tone}\nInput: '{g_input}'\nOutput ONLY the result."
-                resp = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+                resp = client.models.generate_content(model="gemini-3.0-flash-preview", contents=prompt)
                 st.session_state['report_grammar'] = resp.text
                 st.rerun()
             except Exception as e:
