@@ -140,7 +140,7 @@ with tab_grammar:
             try:
                 # Prompt ensuring no chatter
                 prompt = f"Task: {action}\nTone: {tone}\nInput: '{g_input}'\nOutput ONLY the result."
-                resp = client.models.generate_content(model="gemini-3-flash", contents=prompt)
+                resp = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
                 st.session_state['report_grammar'] = resp.text
                 st.rerun()
             except Exception as e:
