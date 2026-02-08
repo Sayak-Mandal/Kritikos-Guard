@@ -115,10 +115,6 @@ with tab_security:
         # 3. THE "QUICK COPY" BOX (NEW FEATURE)
         # We extract ONLY the code block from the AI's response so it's clean
         code_blocks = re.findall(r"```(?:\w+)?\n(.*?)\n```", st.session_state['report_security'], re.DOTALL)
-        if code_blocks:
-            st.info("📋 **Quick Copy Fix:** Use the button in the top-right to copy the corrected code.")
-            # We show the last code block (the fix) in a copyable window
-            st.code(code_blocks[-1], language="python")
 
         # 4. DOWNLOAD BUTTON (Preserved)
         pdf = FPDF()
