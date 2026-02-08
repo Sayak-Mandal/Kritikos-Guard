@@ -115,9 +115,6 @@ with tab_security:
         
         # THE COPY BUTTON (Extracting code blocks)
         code_blocks = re.findall(r"```(?:\w+)?\n(.*?)\n```", report, re.DOTALL)
-        if code_blocks:
-            st.info("📋 **Quick Copy Fix:**")
-            st.code(code_blocks[-1], language="python")
 
         # PDF EXPORT
         pdf = FPDF()
