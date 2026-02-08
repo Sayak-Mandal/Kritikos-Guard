@@ -164,4 +164,10 @@ with tab_grammar:
 
 # --- 4. GLOBAL RESET ---
 st.divider()
-st.button("🔄 GLOBAL SYSTEM RESET", on_click=global_reset, key="global_reset_final")
+
+# ADD THIS LINE BACK: This creates the blue tip box above the button
+st.info("💡 **Tip:** Use the Global Reset to clear all session data before a new audit.", icon=":material/lightbulb:")
+
+# Ensure your button has the unique key to prevent duplicate ID errors
+if st.button("🔄 GLOBAL SYSTEM RESET", on_click=global_reset, key="global_reset_final"):
+    st.toast("System Wiped!", icon="🧹")
