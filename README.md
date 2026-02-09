@@ -1,4 +1,4 @@
-# Kritikos Guard: Enterprise IT Suite
+# Kritikos: Secure IT Suite
 **Multimodal Security Scrutiny & Strategic Communication Powered by Gemini 3**
 
 Kritikos Guard is a high-performance "Digital Sentinel" built to bridge the gap between technical security audits and executive-level reporting. By leveraging the multimodal capabilities of **Google Gemini 3.0 Flash**, it doesn't just scan text—it **discerns** vulnerabilities in raw code, system screenshots, and PDF reports.
@@ -12,7 +12,7 @@ Kritikos Guard is a high-performance "Digital Sentinel" built to bridge the gap 
 * **Executive Polisher:** Translates technical findings into professional reports.
 
 ## Tech Stack
-* **AI Engine:** Google Gemini 2.0 Flash (Multimodal)
+* **AI Engine:** Google Gemini 3.0 Flash (Multimodal)
 * **Frontend:** Streamlit with Custom CSS
 * **Language:** Python 3.12
 * **Libraries:** `google-genai`, `PyPDF2`, `fpdf`, `Pillow`
